@@ -1,3 +1,4 @@
+/* 🌌 Background */
 body {
   font-family: Arial, sans-serif;
   height: 100vh;
@@ -5,57 +6,58 @@ body {
   display: flex;
   justify-content: center;
   padding-top: 50px;
-  animation: gradient 10s ease infinite;
   background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1f1c2c);
   background-size: 400% 400%;
+  animation: gradient 10s ease infinite;
   color: #fff;
 }
 
-.chatbox-border {
-  padding: 3px;
-  border-radius: 10px;
-  background: linear-gradient(
-    135deg,
-    #02025bcb,
-    #4305c8,
-    #007cf0,
-    #032d6d,
-    #0628a4a5,
-    #470486cf,
-    #0528ef,
-  );
-  background-size: 400% 400%;
-  animation: borderGlow 5s ease infinite;
-  display: inline-block;
-  border: none;
-
-  /* 💡 Show border only on top/left/right (hide bottom) */
-  -webkit-mask: linear-gradient(#fff 0 0) content-box,
-    linear-gradient(to bottom, #fff 85%, transparent 100%);
-  -webkit-mask-composite: destination-in;
-  mask-composite: intersect;
-}
-
-@keyframes borderGlow {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
+/* 🧠 Glowing Border Chatbox */
 .chatbox {
-  height: 75vh;
+  height: 80vh;
   width: 500px;
   background: #1c1f26;
   padding: 20px;
   border-radius: 10px;
+  border: 3px solid;
+  border-image: linear-gradient(120deg, #00f0ff, #00b3ff, #a600ff, #00f0ff) 1;
+  border-image-slice: 1;
+  animation: borderFlow 8s linear infinite;
+  position: relative;
 }
 
+/* ✨ Border Animation */
+@keyframes borderFlow {
+  0% {
+    border-image-source: linear-gradient(
+      120deg,
+      #00f0ff,
+      #00b3ff,
+      #a600ff,
+      #00f0ff
+    );
+  }
+  50% {
+    border-image-source: linear-gradient(
+      300deg,
+      #a600ff,
+      #00b3ff,
+      #00f0ff,
+      #a600ff
+    );
+  }
+  100% {
+    border-image-source: linear-gradient(
+      120deg,
+      #00f0ff,
+      #00b3ff,
+      #a600ff,
+      #00f0ff
+    );
+  }
+}
+
+/* 💬 Input Field */
 input[type="text"] {
   width: 80%;
   padding: 10px;
@@ -63,15 +65,17 @@ input[type="text"] {
   border-radius: 5px;
 }
 
+/* 🚀 Send Button */
 button {
   padding: 10px 15px;
-  background: #05598d;
-  color: white;
+  background: #00ffe1;
+  color: black;
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
 
+/* 💭 Message Bubbles */
 .bubble {
   margin-top: 15px;
   padding: 10px;
@@ -84,4 +88,17 @@ button {
 
 .bot {
   background-color: #2d2d2d;
+}
+
+/* 🌈 Background Gradient Animation */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
