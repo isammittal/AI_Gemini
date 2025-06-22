@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sam | AI Chatbot</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="chatbox-border">
+      <div class="chatbox">
+        <h1>Sam's AI Chatbot 💻</h1>
+        <form method="post">
+          <input
+            type="text"
+            name="message"
+            placeholder="Ask me anything..."
+            required
+          />
+          <button type="submit">Send</button>
+        </form>
+  
+        {% if message %}
+        <div class="bubble user"><strong>You:</strong> {{ message }}</div>
+        {% endif %} {% if response %}
+        <div class="bubble bot"><strong>Gemini:</strong> {{ response }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </body>
+  
+</html>
