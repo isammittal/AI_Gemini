@@ -7,7 +7,15 @@
   <body>
     <div class="chatbox">
       <h1>Sam's AI Chatbot 💻</h1>
-      <form method="post">
+      <button
+        id="tts-toggle"
+        class="tts-toggle"
+        title="Toggle sound"
+        aria-label="Toggle sound"
+      >
+        <span id="tts-icon">🔊</span>
+      </button>
+      <form method="post" id="chat-form" autocomplete="off">
         <input
           type="text"
           name="message"
@@ -20,8 +28,28 @@
       {% if message %}
       <div class="bubble user"><strong>You:</strong> {{ message }}</div>
       {% endif %} {% if response %}
-      <div class="bubble bot"><strong>Gemini:</strong> {{ response }}</div>
+      <div
+        class="bubble bot"
+        id="bot-response"
+        data-animate="true"
+        data-final-text="{{ response }}"
+      >
+        <strong>Gemini:</strong>
+        <span class="typing-indicator">Gemini is typing...</span>
+      </div>
       {% endif %}
+      <div class="stop-btn-row">
+        <button
+          id="stop-typing-btn"
+          class="stop-typing-btn"
+          title="Stop AI response"
+          aria-label="Stop AI response"
+          type="button"
+        >
+          <span class="stop-icon">🔴</span>
+        </button>
+      </div>
     </div>
+    <script src="/static/script.js"></script>
   </body>
 </html>
