@@ -1,33 +1,51 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- Page title shown in browser tab -->
     <title>Sam | AI Chatbot</title>
+
+    <!-- Link to external CSS file stored in /static/style.css -->
     <link rel="stylesheet" href="/static/style.css" />
   </head>
   <body>
+    <!-- Main container for chatbot UI -->
     <div class="chatbox">
+      <!-- Heading for chatbot -->
       <h1>Sam's AI Chatbot 💻</h1>
+
+      <!-- Toggle button for text-to-speech (sound on/off) -->
       <button
         id="tts-toggle"
         class="tts-toggle"
         title="Toggle sound"
         aria-label="Toggle sound"
       >
+        <!-- Icon inside the button (starts as sound ON) -->
         <span id="tts-icon">🔊</span>
       </button>
+
+      <!-- Form to send a message to the backend (POST method) -->
       <form method="post" id="chat-form" autocomplete="off">
+        <!-- Input field for typing the message -->
         <input
           type="text"
           name="message"
           placeholder="Ask me anything..."
           required
         />
+        <!-- Submit button to send the message -->
         <button type="submit">Send</button>
       </form>
 
+      <!-- If a user message exists (Jinja2 conditional) -->
       {% if message %}
+      <!-- Show the user's message in a bubble -->
       <div class="bubble user"><strong>You:</strong> {{ message }}</div>
-      {% endif %} {% if response %}
+      {% endif %}
+
+      <!-- If a bot response exists -->
+      {% if response %}
+      <!-- Show bot response area with typing animation placeholder -->
       <div
         class="bubble bot"
         id="bot-response"
@@ -35,9 +53,12 @@
         data-final-text="{{ response }}"
       >
         <strong>Gemini:</strong>
+        <!-- Placeholder text before actual response loads -->
         <span class="typing-indicator">Gemini is typing...</span>
       </div>
       {% endif %}
+
+      <!-- Stop button to interrupt the AI response animation -->
       <div class="stop-btn-row">
         <button
           id="stop-typing-btn"
@@ -46,10 +67,13 @@
           aria-label="Stop AI response"
           type="button"
         >
+          <!-- Stop icon (red circle) -->
           <span class="stop-icon">🔴</span>
         </button>
       </div>
     </div>
+
+    <!-- Link to external JavaScript file stored in /static/script.js -->
     <script src="/static/script.js"></script>
   </body>
 </html>
