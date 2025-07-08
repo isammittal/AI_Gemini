@@ -8,68 +8,149 @@
     <link rel="stylesheet" href="/static/style.css" />
   </head>
   <body>
-    <!-- Main container for chatbot UI -->
-    <div class="chatbox">
-      <!-- Heading for chatbot -->
-      <h1>Sam's AI Chatbot 💻</h1>
+    <!-- Main container with memory sidebar -->
+    <div class="app-container">
+      <!-- Memory Sidebar -->
+      <aside class="memory-sidebar" id="memory-sidebar">
+        <div class="memory-header">
+          <h3>💾 Chat History</h3>
+          <button
+            class="clear-all-btn"
+            id="clear-all-btn"
+            title="Clear all history"
+          >
+            🗑️
+          </button>
+        </div>
 
-      <!-- Toggle button for text-to-speech (sound on/off) -->
-      <button
-        id="tts-toggle"
-        class="tts-toggle"
-        title="Toggle sound"
-        aria-label="Toggle sound"
-      >
-        <!-- Icon inside the button (starts as sound ON) -->
-        <span id="tts-icon">🔊</span>
-      </button>
+        <div class="memory-list" id="memory-list">
+          {% if chat_memory %} {% for date, chats in chat_memory.items() %}
+          <div class="memory-date-group" data-date="{{ date }}">
+            <div class="memory-date-header">
+              <span class="memory-date">{{ date }}</span>
+              <button
+                class="delete-date-btn"
+                data-date="{{ date }}"
+                title="Delete all chats from {{ date }}"
+              >
+                🗑️
+              </button>
+            </div>
+            <div class="memory-chats">
+              {% for chat in chats %}
+              <div class="memory-item" data-session-id="{{ chat.session_id }}">
+                <div class="memory-content">
+                  <div class="memory-summary">{{ chat.summary }}</div>
+                  <div class="memory-time">{{ chat.timestamp[11:16] }}</div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %} {% else %}
+          <div class="no-memory">
+            <p>No chat history yet</p>
+            <p>Start a conversation to see it here!</p>
+          </div>
+          {% endif %}
+        </div>
+      </aside>
 
-      <!-- Form to send a message to the backend (POST method) -->
-      <form method="post" id="chat-form" autocomplete="off">
-        <!-- Input field for typing the message -->
-        <input
-          type="text"
-          name="message"
-          placeholder="Ask me anything..."
-          required
-        />
-        <!-- Submit button to send the message -->
-        <button type="submit">Send</button>
-      </form>
+      <!-- Main Chat Container -->
+      <div class="main-chat-container">
+        <!-- Main container for chatbot UI -->
+        <div class="chatbox">
+          <!-- Heading for chatbot -->
+          <h1>Sam's AI Chatbot 💻</h1>
 
-      <!-- If a user message exists (Jinja2 conditional) -->
-      {% if message %}
-      <!-- Show the user's message in a bubble -->
-      <div class="bubble user"><strong>You:</strong> {{ message }}</div>
-      {% endif %}
+          <!-- Toggle button for text-to-speech (sound on/off) -->
+          <button
+            id="tts-toggle"
+            class="tts-toggle"
+            title="Toggle sound"
+            aria-label="Toggle sound"
+          >
+            <!-- Icon inside the button (starts as sound ON) -->
+            <span id="tts-icon">🔊</span>
+          </button>
 
-      <!-- If a bot response exists -->
-      {% if response %}
-      <!-- Show bot response area with typing animation placeholder -->
-      <div
-        class="bubble bot"
-        id="bot-response"
-        data-animate="true"
-        data-final-text="{{ response }}"
-      >
-        <strong>Gemini:</strong>
-        <!-- Placeholder text before actual response loads -->
-        <span class="typing-indicator">Gemini is typing...</span>
-      </div>
-      {% endif %}
+          <!-- Memory toggle button for mobile -->
+          <button
+            id="memory-toggle"
+            class="memory-toggle"
+            title="Toggle memory sidebar"
+            aria-label="Toggle memory sidebar"
+          >
+            <span id="memory-icon">💾</span>
+          </button>
 
-      <!-- Stop button to interrupt the AI response animation -->
-      <div class="stop-btn-row">
-        <button
-          id="stop-typing-btn"
-          class="stop-typing-btn"
-          title="Stop AI response"
-          aria-label="Stop AI response"
-          type="button"
-        >
-          <!-- Stop icon (red circle) -->
-          <span class="stop-icon">🔴</span>
-        </button>
+          <!-- Form to send a message to the backend (POST method) -->
+          <form method="post" id="chat-form" autocomplete="off">
+            <!-- Input field for typing the message -->
+            <input
+              type="text"
+              name="message"
+              placeholder="Ask me anything..."
+              required
+            />
+            <!-- Submit button to send the message -->
+            <button type="submit">Send</button>
+          </form>
+
+          <!-- Chat history display -->
+          <div class="chat-history" id="chat-history">
+            {% if chat_memory %} {% for date, chats in chat_memory.items() %}
+            <div class="chat-date-section" data-date="{{ date }}">
+              <div class="chat-date-header">
+                <h3>{{ date }}</h3>
+              </div>
+              {% for chat in chats %}
+              <div class="chat-message user">
+                <strong>You:</strong> {{ chat.user_message }}
+              </div>
+              <div class="chat-message bot">
+                <strong>Gemini:</strong> {{ chat.ai_response }}
+              </div>
+              {% endfor %}
+            </div>
+            {% endfor %} {% endif %}
+
+            <!-- Current session messages -->
+            {% if message %}
+            <!-- Show the user's message in a bubble -->
+            <div class="bubble user"><strong>You:</strong> {{ message }}</div>
+            {% endif %}
+
+            <!-- If a bot response exists -->
+            {% if response %}
+            <!-- Show bot response area with typing animation placeholder -->
+            <div
+              class="bubble bot"
+              id="bot-response"
+              data-animate="true"
+              data-final-text="{{ response }}"
+            >
+              <strong>Gemini:</strong>
+              <!-- Placeholder text before actual response loads -->
+              <span class="typing-indicator">Gemini is typing...</span>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Stop button to interrupt the AI response animation -->
+          <div class="stop-btn-row">
+            <button
+              id="stop-typing-btn"
+              class="stop-typing-btn"
+              title="Stop AI response"
+              aria-label="Stop AI response"
+              type="button"
+            >
+              <!-- Stop icon (red circle) -->
+              <span class="stop-icon">🔴</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 

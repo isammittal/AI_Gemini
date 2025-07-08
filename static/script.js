@@ -1,10 +1,17 @@
-// TTS and Typing Animation for Gemini Chatbot
+// TTS, Typing Animation, and Memory System for Gemini Chatbot
 (function () {
   // Get DOM elements
   const ttsToggle = document.getElementById("tts-toggle"); // Toggle button for text-to-speech
   const ttsIcon = document.getElementById("tts-icon"); // Icon (🔊 / 🔇)
   const botBubble = document.getElementById("bot-response"); // Chat bubble with bot's response
   const stopTypingBtn = document.getElementById("stop-typing-btn"); // Button to stop typing animation
+
+  // Memory system elements
+  const memorySidebar = document.getElementById("memory-sidebar");
+  const memoryList = document.getElementById("memory-list");
+  const memoryToggle = document.getElementById("memory-toggle");
+  const clearAllBtn = document.getElementById("clear-all-btn");
+  const chatForm = document.getElementById("chat-form");
 
   // Constants
   const LS_KEY = "tts-muted"; // LocalStorage key for TTS toggle
@@ -14,6 +21,8 @@
   // State variables
   let typingStopped = false; // Flag to check if typing has been interrupted
   let typingTimeout = null; // Timeout ID for typing animation
+
+  // ===== TTS FUNCTIONALITY =====
 
   // Check if TTS is muted from localStorage
   function isMuted() {
@@ -60,6 +69,8 @@
 
   // Initial icon update when script loads
   updateIcon();
+
+  // ===== TYPING ANIMATION =====
 
   // Show typing animation for bot response
   function showTypingAnimation(finalText) {
@@ -117,5 +128,186 @@
     // If no animation, just speak directly if not muted
     const text = botBubble.textContent.replace(/^Gemini:\s*/i, "");
     if (!isMuted()) speak(text);
+  }
+
+  // ===== MEMORY SYSTEM =====
+
+  // Format timestamp for display
+  function formatTimestamp(timestamp) {
+    const date = new Date(timestamp);
+    return date.toISOString().split("T")[0]; // YYYY-MM-DD format
+  }
+
+  // Format time for display
+  function formatTime(timestamp) {
+    const date = new Date(timestamp);
+    return date.toTimeString().slice(0, 5); // HH:MM format
+  }
+
+  // Create memory item HTML
+  function createMemoryItem(chat) {
+    return `
+      <div class="memory-item" data-session-id="${chat.session_id}">
+        <div class="memory-content">
+          <div class="memory-summary">${chat.summary}</div>
+          <div class="memory-time">${formatTime(chat.timestamp)}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Create date group HTML
+  function createDateGroup(date, chats) {
+    const chatItems = chats.map(createMemoryItem).join("");
+    return `
+      <div class="memory-date-group" data-date="${date}">
+        <div class="memory-date-header">
+          <span class="memory-date">${date}</span>
+          <button class="delete-date-btn" data-date="${date}" title="Delete all chats from ${date}">
+            🗑️
+          </button>
+        </div>
+        <div class="memory-chats">
+          ${chatItems}
+        </div>
+      </div>
+    `;
+  }
+
+  // Update memory list display
+  function updateMemoryList(memory) {
+    if (!memoryList) return;
+
+    if (Object.keys(memory).length === 0) {
+      memoryList.innerHTML = `
+        <div class="no-memory">
+          <p>No chat history yet</p>
+          <p>Start a conversation to see it here!</p>
+        </div>
+      `;
+    } else {
+      const dateGroups = Object.entries(memory)
+        .sort(([a], [b]) => new Date(b) - new Date(a)) // Sort dates newest first
+        .map(([date, chats]) => createDateGroup(date, chats))
+        .join("");
+
+      memoryList.innerHTML = dateGroups;
+      // Re-attach event listeners to new elements
+      attachMemoryEventListeners();
+    }
+  }
+
+  // Fetch memory from API
+  async function fetchMemory() {
+    try {
+      const response = await fetch("/api/memory");
+      const data = await response.json();
+      updateMemoryList(data.memory);
+    } catch (error) {
+      console.error("Error fetching memory:", error);
+    }
+  }
+
+  // Delete memory by date
+  async function deleteMemoryByDate(date) {
+    if (!confirm(`Are you sure you want to delete all chats from ${date}?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/memory/date/${date}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        // Reload the page to update the display
+        window.location.reload();
+      } else {
+        console.error("Failed to delete memory");
+      }
+    } catch (error) {
+      console.error("Error deleting memory:", error);
+    }
+  }
+
+  // Clear all memory
+  async function clearAllMemory() {
+    if (
+      !confirm(
+        "Are you sure you want to clear all chat history? This cannot be undone."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/memory", {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        // Reload the page to update the display
+        window.location.reload();
+      } else {
+        console.error("Failed to clear memory");
+      }
+    } catch (error) {
+      console.error("Error clearing memory:", error);
+    }
+  }
+
+  // Attach event listeners to memory elements
+  function attachMemoryEventListeners() {
+    // Delete date buttons
+    const deleteDateBtns = document.querySelectorAll(".delete-date-btn");
+    deleteDateBtns.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const date = btn.dataset.date;
+        deleteMemoryByDate(date);
+      });
+    });
+
+    // Memory items (for potential future click functionality)
+    const memoryItems = document.querySelectorAll(".memory-item");
+    memoryItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        // Future: could implement click to load specific chat
+        console.log("Memory item clicked:", item.dataset.sessionId);
+      });
+    });
+  }
+
+  // ===== MOBILE SIDEBAR TOGGLE =====
+
+  // Toggle memory sidebar on mobile
+  if (memoryToggle) {
+    memoryToggle.addEventListener("click", function () {
+      memorySidebar.classList.toggle("active");
+    });
+  }
+
+  // ===== EVENT LISTENERS =====
+
+  // Clear all button
+  if (clearAllBtn) {
+    clearAllBtn.addEventListener("click", clearAllMemory);
+  }
+
+  // Form submission - reload page after sending message
+  if (chatForm) {
+    chatForm.addEventListener("submit", function () {
+      // The form will submit normally and reload the page
+      // This ensures the new message appears in the chat history
+    });
+  }
+
+  // Initial setup
+  attachMemoryEventListeners();
+
+  // Auto-scroll chat history to bottom
+  const chatHistory = document.getElementById("chat-history");
+  if (chatHistory) {
+    chatHistory.scrollTop = chatHistory.scrollHeight;
   }
 })();
