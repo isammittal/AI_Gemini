@@ -11,6 +11,7 @@
   const memoryList = document.getElementById("memory-list");
   const memoryToggle = document.getElementById("memory-toggle");
   const clearAllBtn = document.getElementById("clear-all-btn");
+  const newChatBtn = document.getElementById("new-chat-btn");
   const chatForm = document.getElementById("chat-form");
 
   // Constants
@@ -138,37 +139,25 @@
     return date.toISOString().split("T")[0]; // YYYY-MM-DD format
   }
 
-  // Format time for display
-  function formatTime(timestamp) {
-    const date = new Date(timestamp);
-    return date.toTimeString().slice(0, 5); // HH:MM format
-  }
-
   // Create memory item HTML
-  function createMemoryItem(chat) {
+  function createMemoryItem(session) {
     return `
-      <div class="memory-item" data-session-id="${chat.session_id}">
+      <div class="memory-item" data-session-id="${session.session_id}">
         <div class="memory-content">
-          <div class="memory-summary">${chat.summary}</div>
-          <div class="memory-time">${formatTime(chat.timestamp)}</div>
+          <div class="memory-title">${session.title}</div>
+          <div class="memory-date">${formatTimestamp(
+            session.last_updated
+          )}</div>
         </div>
-      </div>
-    `;
-  }
-
-  // Create date group HTML
-  function createDateGroup(date, chats) {
-    const chatItems = chats.map(createMemoryItem).join("");
-    return `
-      <div class="memory-date-group" data-date="${date}">
-        <div class="memory-date-header">
-          <span class="memory-date">${date}</span>
-          <button class="delete-date-btn" data-date="${date}" title="Delete all chats from ${date}">
-            🗑️
-          </button>
-        </div>
-        <div class="memory-chats">
-          ${chatItems}
+        <div class="memory-actions">
+          <button class="memory-menu-btn" title="More options">⋮</button>
+          <div class="memory-dropdown">
+            <button class="delete-memory-btn" data-session-id="${
+              session.session_id
+            }">
+              🗑️ Delete
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -186,12 +175,12 @@
         </div>
       `;
     } else {
-      const dateGroups = Object.entries(memory)
-        .sort(([a], [b]) => new Date(b) - new Date(a)) // Sort dates newest first
-        .map(([date, chats]) => createDateGroup(date, chats))
+      const memoryItems = Object.values(memory)
+        .sort((a, b) => new Date(b.last_updated) - new Date(a.last_updated)) // Sort by last updated
+        .map(createMemoryItem)
         .join("");
 
-      memoryList.innerHTML = dateGroups;
+      memoryList.innerHTML = memoryItems;
       // Re-attach event listeners to new elements
       attachMemoryEventListeners();
     }
@@ -208,14 +197,14 @@
     }
   }
 
-  // Delete memory by date
-  async function deleteMemoryByDate(date) {
-    if (!confirm(`Are you sure you want to delete all chats from ${date}?`)) {
+  // Delete memory session
+  async function deleteMemory(sessionId) {
+    if (!confirm("Are you sure you want to delete this chat session?")) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/memory/date/${date}`, {
+      const response = await fetch(`/api/memory/${sessionId}`, {
         method: "DELETE",
       });
 
@@ -228,6 +217,30 @@
     } catch (error) {
       console.error("Error deleting memory:", error);
     }
+  }
+
+  // Create new chat session
+  async function createNewChat() {
+    try {
+      const response = await fetch("/api/memory/new", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Redirect to the new session
+        window.location.href = `/?session_id=${data.session_id}`;
+      } else {
+        console.error("Failed to create new chat");
+      }
+    } catch (error) {
+      console.error("Error creating new chat:", error);
+    }
+  }
+
+  // Load session
+  function loadSession(sessionId) {
+    window.location.href = `/?session_id=${sessionId}`;
   }
 
   // Clear all memory
@@ -258,24 +271,37 @@
 
   // Attach event listeners to memory elements
   function attachMemoryEventListeners() {
-    // Delete date buttons
-    const deleteDateBtns = document.querySelectorAll(".delete-date-btn");
-    deleteDateBtns.forEach((btn) => {
-      btn.addEventListener("click", (e) => {
+    // Delete memory buttons
+    const deleteButtons = document.querySelectorAll(".delete-memory-btn");
+    deleteButtons.forEach((button) => {
+      button.addEventListener("click", (e) => {
         e.stopPropagation();
-        const date = btn.dataset.date;
-        deleteMemoryByDate(date);
+        const sessionId = button.dataset.sessionId;
+        deleteMemory(sessionId);
       });
     });
 
-    // Memory items (for potential future click functionality)
+    // Memory items (click to load session)
     const memoryItems = document.querySelectorAll(".memory-item");
     memoryItems.forEach((item) => {
       item.addEventListener("click", () => {
-        // Future: could implement click to load specific chat
-        console.log("Memory item clicked:", item.dataset.sessionId);
+        const sessionId = item.dataset.sessionId;
+        loadSession(sessionId);
       });
     });
+
+    // Highlight current session
+    const currentSessionId = new URLSearchParams(window.location.search).get(
+      "session_id"
+    );
+    if (currentSessionId) {
+      const currentItem = document.querySelector(
+        `[data-session-id="${currentSessionId}"]`
+      );
+      if (currentItem) {
+        currentItem.classList.add("active");
+      }
+    }
   }
 
   // ===== MOBILE SIDEBAR TOGGLE =====
@@ -288,6 +314,11 @@
   }
 
   // ===== EVENT LISTENERS =====
+
+  // New Chat button
+  if (newChatBtn) {
+    newChatBtn.addEventListener("click", createNewChat);
+  }
 
   // Clear all button
   if (clearAllBtn) {

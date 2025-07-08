@@ -68,6 +68,39 @@ body {
   opacity: 1;
 }
 
+/* New Chat Section */
+.new-chat-section {
+  padding: 12px;
+  border-bottom: 1px solid #4a4b53;
+}
+
+.new-chat-btn {
+  width: 100%;
+  background: #40414f;
+  border: 1px solid #565869;
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.new-chat-btn:hover {
+  background: #565869;
+  border-color: #676a7d;
+}
+
+.new-chat-icon {
+  font-size: 16px;
+  font-weight: bold;
+}
+
 .memory-list {
   flex: 1;
   overflow-y: auto;
@@ -91,56 +124,10 @@ body {
   background: #676a7d;
 }
 
-/* Date Group Styling */
-.memory-date-group {
-  margin-bottom: 16px;
-}
-
-.memory-date-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  background: #2d2d2d;
-  border-bottom: 1px solid #40414f;
-  position: relative;
-}
-
-.memory-date {
-  font-size: 12px;
-  color: #8e8ea0;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.delete-date-btn {
-  background: none;
-  border: none;
-  color: #8e8ea0;
-  font-size: 14px;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-  opacity: 0;
-}
-
-.memory-date-header:hover .delete-date-btn {
-  opacity: 1;
-}
-
-.delete-date-btn:hover {
-  background: #40414f;
-  color: #ff6b6b;
-}
-
-.memory-chats {
-  padding: 4px 0;
-}
-
+/* Memory Item Styling */
 .memory-item {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
   margin: 2px 8px;
@@ -154,12 +141,17 @@ body {
   background: #40414f;
 }
 
+.memory-item.active {
+  background: #40414f;
+  border-left: 3px solid #00f0ff;
+}
+
 .memory-content {
   flex: 1;
   min-width: 0;
 }
 
-.memory-summary {
+.memory-title {
   font-size: 13px;
   color: #fff;
   margin-bottom: 2px;
@@ -167,11 +159,77 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.4;
+  font-weight: 500;
 }
 
-.memory-time {
+.memory-date {
   font-size: 11px;
   color: #8e8ea0;
+}
+
+.memory-actions {
+  position: relative;
+  margin-left: 10px;
+}
+
+.memory-menu-btn {
+  background: none;
+  border: none;
+  color: #8e8ea0;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  opacity: 0;
+}
+
+.memory-item:hover .memory-menu-btn {
+  opacity: 1;
+}
+
+.memory-menu-btn:hover {
+  color: #fff;
+  background: #565869;
+}
+
+.memory-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #2d2d2d;
+  border: 1px solid #40414f;
+  border-radius: 6px;
+  padding: 4px;
+  min-width: 120px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  z-index: 100;
+}
+
+.memory-actions:hover .memory-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.delete-memory-btn {
+  background: none;
+  border: none;
+  color: #ff6b6b;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 4px;
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.delete-memory-btn:hover {
+  background: rgba(255, 107, 107, 0.2);
 }
 
 .no-memory {
@@ -236,25 +294,6 @@ body {
 
 .chat-history::-webkit-scrollbar-thumb:hover {
   background: #676a7d;
-}
-
-.chat-date-section {
-  margin-bottom: 24px;
-}
-
-.chat-date-header {
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #4a4b53;
-}
-
-.chat-date-header h3 {
-  margin: 0;
-  color: #8e8ea0;
-  font-size: 14px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .chat-message {

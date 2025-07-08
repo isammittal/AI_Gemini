@@ -1,18 +1,1 @@
-{
-  "2025-07-08": [
-    {
-      "session_id": "de548f79-9b02-4445-a50e-65b62bbc5459",
-      "user_message": "hi ",
-      "ai_response": "Hi there! How can I help you today?\n",
-      "timestamp": "2025-07-08T09:48:17.457179",
-      "summary": "hi "
-    },
-    {
-      "session_id": "3367b63f-aba4-4742-a4ec-67defde3a77d",
-      "user_message": "fine",
-      "ai_response": "Okay. Is there anything I can help you with?\n",
-      "timestamp": "2025-07-08T09:48:24.691520",
-      "summary": "fine"
-    }
-  ]
-}
+{}
