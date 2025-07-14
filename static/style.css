@@ -232,6 +232,57 @@ body {
   background: rgba(255, 107, 107, 0.2);
 }
 
+.rename-memory-btn {
+  background: none;
+  border: none;
+  color: #00f0ff;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 4px;
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.rename-memory-btn:hover {
+  background: rgba(0, 240, 255, 0.2);
+}
+
+.memory-title-input {
+  background: #40414f !important;
+  border: 1px solid #00f0ff !important;
+  border-radius: 4px !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  padding: 4px 8px !important;
+  width: 100% !important;
+  outline: none !important;
+  font-family: inherit !important;
+  transition: all 0.2s ease !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+}
+
+.memory-title-input:focus {
+  border-color: #00ffe1 !important;
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.2) !important;
+  background: #4a4b53 !important;
+}
+
+.memory-title-input::placeholder {
+  color: #8e8ea0 !important;
+}
+
+/* Smooth transition for title display/hide */
+.memory-title {
+  transition: opacity 0.2s ease;
+}
+
+.memory-title[style*="display: none"] {
+  opacity: 0;
+}
+
 .no-memory {
   padding: 20px 12px;
   text-align: center;

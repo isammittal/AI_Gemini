@@ -32,30 +32,37 @@
         </div>
 
         <div class="memory-list" id="memory-list">
-          {% if chat_memory %} {% for session_id, session in chat_memory.items()
-          %}
-          <div class="memory-item" data-session-id="{{ session.session_id }}">
-            <div class="memory-content">
-              <div class="memory-title">{{ session.title }}</div>
-              <div class="memory-date">{{ session.last_updated[:10] }}</div>
-            </div>
-            <div class="memory-actions">
-              <button class="memory-menu-btn" title="More options">⋮</button>
-              <div class="memory-dropdown">
-                <button
-                  class="delete-memory-btn"
-                  data-session-id="{{ session.session_id }}"
-                >
-                  🗑️ Delete
-                </button>
+          {% if chats %}
+            {% for chat in chats %}
+            <div class="memory-item" data-chat-id="{{ chat.id }}" {% if chat.id == current_chat_id %}class="memory-item active"{% endif %}>
+              <div class="memory-content">
+                <div class="memory-title">{{ chat.title }}</div>
+                <div class="memory-date">{{ chat.date }}</div>
+              </div>
+              <div class="memory-actions">
+                <button class="memory-menu-btn" title="More options">⋮</button>
+                <div class="memory-dropdown">
+                  <button
+                    class="rename-memory-btn"
+                    data-chat-id="{{ chat.id }}"
+                  >
+                    ✏️ Rename
+                  </button>
+                  <button
+                    class="delete-memory-btn"
+                    data-chat-id="{{ chat.id }}"
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-          {% endfor %} {% else %}
-          <div class="no-memory">
-            <p>No chat history yet</p>
-            <p>Start a conversation to see it here!</p>
-          </div>
+            {% endfor %}
+          {% else %}
+            <div class="no-memory">
+              <p>No chat history yet</p>
+              <p>Start a conversation to see it here!</p>
+            </div>
           {% endif %}
         </div>
       </aside>
@@ -90,12 +97,12 @@
 
           <!-- Form to send a message to the backend (POST method) -->
           <form method="post" id="chat-form" autocomplete="off">
-            <!-- Hidden session ID field -->
-            {% if current_session_id %}
+            <!-- Hidden chat ID field -->
+            {% if current_chat_id %}
             <input
               type="hidden"
-              name="session_id"
-              value="{{ current_session_id }}"
+              name="chat_id"
+              value="{{ current_chat_id }}"
             />
             {% endif %}
 
@@ -112,15 +119,20 @@
 
           <!-- Chat history display -->
           <div class="chat-history" id="chat-history">
-            <!-- Previous session messages -->
-            {% if current_messages %} {% for message in current_messages %}
-            <div class="chat-message user">
-              <strong>You:</strong> {{ message.user_message }}
-            </div>
-            <div class="chat-message bot">
-              <strong>Gemini:</strong> {{ message.ai_response }}
-            </div>
-            {% endfor %} {% endif %}
+            <!-- Previous chat messages -->
+            {% if current_messages %}
+              {% for message in current_messages %}
+                {% if message.role == "user" %}
+                <div class="chat-message user">
+                  <strong>You:</strong> {{ message.text }}
+                </div>
+                {% elif message.role == "ai" %}
+                <div class="chat-message bot">
+                  <strong>Gemini:</strong> {{ message.text }}
+                </div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
 
             <!-- Current session messages -->
             {% if message %}
