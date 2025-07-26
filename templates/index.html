@@ -71,29 +71,33 @@
       <div class="main-chat-container">
         <!-- Main container for chatbot UI -->
         <div class="chatbox">
-          <!-- Heading for chatbot -->
-          <h1>Sam's AI Chatbot 💻</h1>
+          <!-- Header -->
+          <div class="chat-header">
+            <div class="chat-title">
+              <h1>Sam's AI Chatbot 💻</h1>
+            </div>
 
-          <!-- Toggle button for text-to-speech (sound on/off) -->
-          <button
-            id="tts-toggle"
-            class="tts-toggle"
-            title="Toggle sound"
-            aria-label="Toggle sound"
-          >
-            <!-- Icon inside the button (starts as sound ON) -->
-            <span id="tts-icon">🔊</span>
-          </button>
+            <!-- Toggle button for text-to-speech (sound on/off) -->
+            <button
+              id="tts-toggle"
+              class="tts-toggle"
+              title="Toggle sound"
+              aria-label="Toggle sound"
+            >
+              <!-- Icon inside the button (starts as sound ON) -->
+              <span id="tts-icon">🔊</span>
+            </button>
 
-          <!-- Memory toggle button for mobile -->
-          <button
-            id="memory-toggle"
-            class="memory-toggle"
-            title="Toggle memory sidebar"
-            aria-label="Toggle memory sidebar"
-          >
-            <span id="memory-icon">💾</span>
-          </button>
+            <!-- Memory toggle button for mobile -->
+            <button
+              id="memory-toggle"
+              class="memory-toggle"
+              title="Toggle memory sidebar"
+              aria-label="Toggle memory sidebar"
+            >
+              <span id="memory-icon">💾</span>
+            </button>
+          </div>
 
           <!-- Form to send a message to the backend (POST method) -->
           <form method="post" id="chat-form" autocomplete="off">

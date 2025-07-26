@@ -33,38 +33,20 @@ templates = Jinja2Templates(directory="templates")
 CHAT_MEMORY_FILE = "chat_memory.json"
 
 def load_chat_memory() -> List[Dict[str, Any]]:
-    """Load chat memory from JSON file in the specified format"""
+    """Load chat memory from JSON file"""
     try:
         if os.path.exists(CHAT_MEMORY_FILE):
             with open(CHAT_MEMORY_FILE, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                # Convert old format to new format if needed
-                if isinstance(data, dict):
-                    # Convert session-based format to new format
-                    chats = []
-                    for session_id, session in data.items():
-                        if session.get("messages"):  # Only include chats with messages
-                            chat = {
-                                "id": session_id,
-                                "title": session.get("title", "New Chat"),
-                                "date": session.get("created_at", datetime.now().isoformat()[:10]),
-                                "messages": []
-                            }
-                            # Convert messages to the expected format
-                            for msg in session.get("messages", []):
-                                chat["messages"].extend([
-                                    {"role": "user", "text": msg.get("user_message", "")},
-                                    {"role": "ai", "text": msg.get("ai_response", "")}
-                                ])
-                            chats.append(chat)
-                    return chats
-                return data if isinstance(data, list) else []
+                if isinstance(data, list):
+                    return data
+                return []
         return []
     except Exception as e:
         print(f"Error loading chat memory: {e}")
         return []
 
-def save_chat_memory(chats: List[Dict[str, Any]]) -> None:
+def save_chat_memory(chats: List[Dict[str, Any]]):
     """Save chat memory to JSON file"""
     try:
         with open(CHAT_MEMORY_FILE, 'w', encoding='utf-8') as f:
@@ -89,32 +71,24 @@ def create_new_chat() -> Dict[str, Any]:
         "date": datetime.now().isoformat()[:10],
         "messages": []
     }
-    chats.insert(0, new_chat)  # Add to beginning
+    chats.insert(0, new_chat)
     save_chat_memory(chats)
     return new_chat
 
 def add_message_to_chat(chat_id: str, user_message: str, ai_response: str) -> bool:
     """Add a message to an existing chat"""
     chats = load_chat_memory()
-    
     for chat in chats:
         if chat.get("id") == chat_id:
-            # Add messages
             chat["messages"].extend([
                 {"role": "user", "text": user_message},
                 {"role": "ai", "text": ai_response}
             ])
-            
-            # Update title if this is the first message
-            if len(chat["messages"]) == 2:  # First user + AI message
+            if len(chat["messages"]) == 2:
                 chat["title"] = user_message[:50] + "..." if len(user_message) > 50 else user_message
-            
-            # Update date
             chat["date"] = datetime.now().isoformat()[:10]
-            
             save_chat_memory(chats)
             return True
-    
     return False
 
 def rename_chat(chat_id: str, new_title: str) -> bool:
@@ -175,14 +149,29 @@ async def chat_message(request: Request, message: str = Form(...), chat_id: str 
             new_chat = create_new_chat()
             chat_id = new_chat["id"]
         
-        # Start a new chat session with Gemini model
-        chat = model.start_chat()
+        # Check for owner-related questions
+        owner_keywords = [
+            "who is the owner", "who owns", "who created", "who made", "who built",
+            "owner of this", "creator of this", "who developed", "who programmed",
+            "who is sam", "tell me about sam", "about the owner", "about the creator"
+        ]
         
-        # Send user message to the Gemini model and get response
-        response = chat.send_message(message)
+        message_lower = message.lower()
+        is_owner_question = any(keyword in message_lower for keyword in owner_keywords)
+        
+        if is_owner_question:
+            # Custom response for owner questions
+            custom_response = """This chatbot is owned by Sam Mittal. He is a Junior Programmer who loves to write code. He has built this AI Chatbot using an API Gemini Key from Google.."""
+        else:
+            # Start a new chat session with Gemini model
+            chat = model.start_chat()
+            
+            # Send user message to the Gemini model and get response
+            response = chat.send_message(message)
+            custom_response = response.text
         
         # Add message to chat
-        add_message_to_chat(chat_id, message, response.text)
+        add_message_to_chat(chat_id, message, custom_response)
         
         # Get updated chat data
         current_chat = get_chat_by_id(chat_id)
@@ -192,7 +181,7 @@ async def chat_message(request: Request, message: str = Form(...), chat_id: str 
         # Render the page with the response
         return templates.TemplateResponse("index.html", {
             "request": request,
-            "response": response.text,
+            "response": custom_response,
             "message": message,
             "chats": chats,
             "current_chat_id": chat_id,
