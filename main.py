@@ -27,7 +27,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Setup templates directory
-templates = Jinja2Templates(directory=".")
+templates = Jinja2Templates(directory="templates")
 
 # Chat memory file path
 CHAT_MEMORY_FILE = "chat_memory.json"
