@@ -27,7 +27,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Setup templates directory
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=".")
 
 # Chat memory file path
 CHAT_MEMORY_FILE = "chat_memory.json"
@@ -198,6 +198,12 @@ async def chat_message(request: Request, message: str = Form(...), chat_id: str 
             "current_chat_id": chat_id,
             "current_messages": []
         })
+
+# GET route to serve the main template for any unknown path
+@app.get("/{full_path:path}", response_class=HTMLResponse)
+async def catch_all(request: Request, full_path: str):
+    # Always render the main template for any unknown path
+    return templates.TemplateResponse("index.html", {"request": request})
 
 # API endpoint to get all chats
 @app.get("/api/chats", response_class=JSONResponse)
