@@ -202,7 +202,6 @@ async def chat_message(request: Request, message: str = Form(...), chat_id: str 
 # GET route to serve the main template for any unknown path
 @app.get("/{full_path:path}", response_class=HTMLResponse)
 async def catch_all(request: Request, full_path: str):
-    # Always render the main template for any unknown path
     return templates.TemplateResponse("index.html", {"request": request})
 
 # API endpoint to get all chats

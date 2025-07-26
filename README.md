@@ -49,7 +49,24 @@ GEMINI_API_KEY=your_gemini_api_key_here
 2. Create a new API key
 3. Copy the key to your `.env` file
 
-### 5. Run the Application
+### 5. File Structure (IMPORTANT)
+
+```
+project-root/
+│
+├── main.py
+├── requirements.txt
+├── chat_memory.json
+├── .env
+├── templates/
+│   └── index.html
+├── static/
+│   ├── style.css
+│   ├── script.js
+│   └── favicon.ico
+```
+
+### 6. Run the Application
 
 ```bash
 python main.py
@@ -61,9 +78,9 @@ Or with uvicorn:
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 6. Access the Application
+### 7. Access the Application
 
-- Open your browser to `http://localhost:8000`
+- Open your browser to `http://localhost:8000/`
 - Start chatting with the AI!
 
 ## 📁 Project Structure
