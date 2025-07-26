@@ -123,6 +123,14 @@
 
           <!-- Chat history display -->
           <div class="chat-history" id="chat-history">
+            <!-- Welcome message when no chat history -->
+            {% if not current_messages and not message and not response %}
+            <div class="welcome-message">
+              <h2>Welcome. What would you like to discuss?</h2>
+              <p>Start a conversation or ask a question to begin...</p>
+            </div>
+            {% endif %}
+
             <!-- Previous chat messages -->
             {% if current_messages %}
               {% for message in current_messages %}

@@ -161,7 +161,7 @@ async def chat_message(request: Request, message: str = Form(...), chat_id: str 
         
         if is_owner_question:
             # Custom response for owner questions
-            custom_response = """This chatbot is owned by Sam Mittal. He is a Junior Programmer who loves to write code. He has built this AI Chatbot using an API Gemini Key from Google.."""
+            custom_response = """This chatbot is owned by Sam Mittal. He is a Junior Programmer who loves to write code. He has built this AI Chatbot using an API Gemini Key from Google."""
         else:
             # Start a new chat session with Gemini model
             chat = model.start_chat()
